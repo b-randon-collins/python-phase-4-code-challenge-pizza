@@ -51,5 +51,11 @@ def delete_restaurant(id):
         return make_response("", 204)
     return make_response(jsonify({"error": "Restaurant not found"}), 404)
 
+@app.route('/pizzas', methods=['GET'])
+def get_pizzas():
+    pizzas = Pizza.query.all()
+    return jsonify([pizza.to_dict() for pizza in pizzas])
+
+
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
