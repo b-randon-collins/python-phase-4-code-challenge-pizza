@@ -37,14 +37,14 @@ def get_restaurants():
 
 @app.route('/restaurants/<int:id>', methods=['GET'])
 def get_restaurant(id):
-    restaurant = Restaurant.query.get(id)
+    restaurant = db.session.get(Restaurant, id)
     if restaurant:
         return jsonify(restaurant.to_dict())
     return make_response(jsonify({"error": "Restaurant not found"}), 404)
 
 @app.route('/restaurants/<int:id>', methods=['DELETE'])
 def delete_restaurant(id):
-    restaurant = Restaurant.query.get(id)
+    restaurant = db.session.get(Restaurant, id)
     if restaurant:
         db.session.delete(restaurant)
         db.session.commit()
@@ -56,6 +56,20 @@ def get_pizzas():
     pizzas = Pizza.query.all()
     return jsonify([pizza.to_dict() for pizza in pizzas])
 
+@app.route('/restaurant_pizzas', methods=['POST'])
+def create_restaurant_pizza():
+    data = request.get_json()
+    try:
+        new_restaurant_pizza = RestaurantPizza(
+            price=data["price"],
+            pizza_id=data["pizza_id"],
+            restaurant_id=data["restaurant_id"]
+        )
+        db.session.add(new_restaurant_pizza)
+        db.session.commit()
+        return jsonify(new_restaurant_pizza.to_dict()), 201
+    except Exception as e:
+        return make_response(jsonify({"errors": ["validation errors"]}), 400)
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
