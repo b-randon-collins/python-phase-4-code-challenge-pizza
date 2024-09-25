@@ -35,5 +35,21 @@ def get_restaurants():
     
     return jsonify(result)
 
+@app.route('/restaurants/<int:id>', methods=['GET'])
+def get_restaurant(id):
+    restaurant = Restaurant.query.get(id)
+    if restaurant:
+        return jsonify(restaurant.to_dict())
+    return make_response(jsonify({"error": "Restaurant not found"}), 404)
+
+@app.route('/restaurants/<int:id>', methods=['DELETE'])
+def delete_restaurant(id):
+    restaurant = Restaurant.query.get(id)
+    if restaurant:
+        db.session.delete(restaurant)
+        db.session.commit()
+        return make_response("", 204)
+    return make_response(jsonify({"error": "Restaurant not found"}), 404)
+
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
